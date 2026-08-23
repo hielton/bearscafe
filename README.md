@@ -125,19 +125,7 @@ The project will be developed incrementally following the Software Development L
 Project Phase: Planning / Requirements
 The project is currently in the planning and requirements phase. Development of the application will begin after the initial requirements and system design have been finalized.
 
-## Future Goals
-Potential future improvements include:
-* AI-generated summaries of student feedback
-* More advanced analytics
-* Dietary and allergen information
-* Meal recommendations
-* Push notifications
-* Future meal schedules
-* University authentication integration
-* Mobile application
-* Custom food-recognition model
 
-
-CSC 490 – Senior Project
+## CSC 490 – Senior Project
 Shaw University
 Fall 2026
