@@ -13,7 +13,7 @@ function Navbar() {
                 <Link to="/">Home</Link>
                 <Link to="/meals">Meals</Link>
                 <Link to="/login">Login</Link>
-                <Link to="/staff">Staff Dashboard</Link>
+                <Link to="/staff-dashboard">Staff Dashboard</Link>
                 <Link to="/add-meals">Add meals</Link>
             </div>
     

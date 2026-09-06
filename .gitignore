@@ -1,24 +1,169 @@
-# Logs
-logs
-*.log
+# =========================================================
+# BearsCafe .gitignore
+# React + Vite + Spring Boot + PostgreSQL
+# =========================================================
+
+
+# -------------------------
+# SECRETS / ENVIRONMENT
+# -------------------------
+
+# Environment variable files
+.env
+backend/.env
+.env.*
+!.env.example
+
+# Backend local configuration containing passwords/secrets
+application-local.properties
+application-local.yml
+application-local.yaml
+
+# Optional secret/property files
+*.secret
+*.secrets
+
+
+# -------------------------
+# FRONTEND - React / Vite
+# -------------------------
+
+node_modules/
+frontend/node_modules/
+
+dist/
+frontend/dist/
+
+build/
+frontend/build/
+
+.vite/
+frontend/.vite/
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+coverage/
+frontend/coverage/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+
+# -------------------------
+# BACKEND - Spring Boot / Maven
+# -------------------------
+
+target/
+backend/target/
+
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven logs
+maven-debug.log
+
+# Keep Maven Wrapper
+!mvnw
+!mvnw.cmd
+!.mvn/
+
+
+# -------------------------
+# DATABASE / LOCAL DATA
+# -------------------------
+
+*.db
+*.sqlite
+*.sqlite3
+
+# Database dumps / backups
+*.sql
+*.dump
+*.backup
+
+
+# -------------------------
+# VS CODE
+# -------------------------
+
+.vscode/
+
+# If you later want to share certain VS Code settings,
+# this can be customized.
+
+
+# -------------------------
+# INTELLIJ IDEA
+# -------------------------
+
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+
+# -------------------------
+# ECLIPSE / SPRING TOOLS
+# -------------------------
+
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+
+
+# -------------------------
+# OPERATING SYSTEM FILES
+# -------------------------
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+
+# -------------------------
+# TEMPORARY FILES
+# -------------------------
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.log
+
+.cache/
+tmp/
+temp/
+
+
+# -------------------------
+# TEST OUTPUT
+# -------------------------
+
+test-results/
+reports/
+
+
+# -------------------------
+# SECURITY / KEYS
+# -------------------------
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# SSH keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub

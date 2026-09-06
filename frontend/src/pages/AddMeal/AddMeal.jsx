@@ -1,8 +1,145 @@
+import { useState } from "react";
+import axios from "axios";
+import "./AddMeal.css";
+
 function AddMeal() {
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    imageUrl: "",
+    mealDate: "",
+    mealPeriod: "BREAKFAST",
+    status: "DRAFT",
+  });
+
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/meals",
+        formData
+      );
+
+      console.log("Meal created:", response.data);
+
+      setMessage("Meal added successfully!");
+
+      setFormData({
+        name: "",
+        description: "",
+        imageUrl: "",
+        mealDate: "",
+        mealPeriod: "BREAKFAST",
+        status: "DRAFT",
+      });
+    } catch (error) {
+      console.error("Error adding meal:", error);
+      setError("Could not add meal. Please try again.");
+    }
+  }
+
   return (
-    <div>
-      <h1>Add a Meal</h1>
-      <p>Cafeteria staff can add a new meal here.</p>
+    <div className="add-meal-page">
+      <h1>Add Meal</h1>
+
+      <form className="add-meal-form" onSubmit={handleSubmit}>
+        <label>
+          Meal Name
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </label>
+
+        <label>
+          Description
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="4"
+          />
+        </label>
+
+        <label>
+          Meal Date
+          <input
+            type="date"
+            name="mealDate"
+            value={formData.mealDate}
+            onChange={handleChange}
+            required
+          />
+        </label>
+
+        <label>
+          Meal Period
+          <select
+            name="mealPeriod"
+            value={formData.mealPeriod}
+            onChange={handleChange}
+          >
+            <option value="BREAKFAST">Breakfast</option>
+            <option value="LUNCH">Lunch</option>
+            <option value="DINNER">Dinner</option>
+          </select>
+        </label>
+
+        <label>
+          Status
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+          >
+            <option value="DRAFT">Draft</option>
+            <option value="PUBLISHED">Published</option>
+            <option value="UNPUBLISHED">Unpublished</option>
+          </select>
+        </label>
+
+        <label>
+          Image URL
+          <input
+            type="text"
+            name="imageUrl"
+            value={formData.imageUrl}
+            onChange={handleChange}
+            placeholder="Optional"
+          />
+        </label>
+
+        <button type="submit">
+          Add Meal
+        </button>
+      </form>
+
+      {message && (
+        <p className="success-message">{message}</p>
+      )}
+
+      {error && (
+        <p className="error-message">{error}</p>
+      )}
     </div>
   );
 }

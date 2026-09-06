@@ -8,6 +8,7 @@ import Home from "./pages/Home/Home";
 import Meals from "./pages/Meals/Meals";
 import StaffDashboard from "./pages/StaffDashboard/StaffDashboard";
 import AddMeal from "./pages/AddMeal/AddMeal";
+import EditMeal from "./pages/EditMeal/EditMeal";
 
 function AppContent() {
   const location = useLocation();
@@ -26,11 +27,10 @@ function AppContent() {
 
         <Route path="/home" element={<Home />} />
         <Route path="/meals" element={<Meals />} />
-        <Route path="/add-meal" element={<AddMeal />} />
-        <Route
-          path="/staff-dashboard"
-          element={<StaffDashboard />}
-        />
+        <Route path="/staff-dashboard" element={<StaffDashboard />} />
+        <Route path="/add-meals" element={<AddMeal />} />
+        <Route path="/edit-meal/:id" element={<EditMeal />}
+/>
       </Routes>
     </>
   );

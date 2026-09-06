@@ -1,58 +1,97 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import MealCard from "../../components/MealCard/MealCard";
 import "./Meals.css";
 
 function Meals() {
-  const meals = [
-    {
-      id: 1,
-      name: "Chicken Alfredo",
-      description: "Creamy Alfredo pasta served with grilled chicken.",
-      category: "Lunch",
-      rating: 4.5,
-      image: "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0"
-    },
-    {
-      id: 2,
-      name: "Cheeseburger",
-      description: "Juicy beef burger topped with melted cheese, lettuce, and tomato.",
-      category: "Lunch",
-      rating: 4.2,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd"
-    },
-    {
-      id: 3,
-      name: "Caesar Salad",
-      description: "Fresh romaine lettuce with Caesar dressing, croutons, and parmesan.",
-      category: "Healthy",
-      rating: 4.7,
-      image: "https://images.unsplash.com/photo-1546793665-c74683f339c1"
-    },
-    {
-      id: 4,
-      name: "Chicken Tacos",
-      description: "Seasoned chicken tacos served with fresh vegetables and salsa.",
-      category: "Mexican",
-      rating: 4.6,
-      image: "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85"
-    }
-  ];
+  const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/meals/today")
+      .then((response) => {
+        setMeals(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching today's meals:", error);
+        setError("Could not load today's meals.");
+        setLoading(false);
+      });
+  }, []);
+
+  const breakfastMeals = meals.filter(
+    (meal) => meal.mealPeriod?.toUpperCase() === "BREAKFAST"
+  );
+
+  const lunchMeals = meals.filter(
+    (meal) => meal.mealPeriod?.toUpperCase() === "LUNCH"
+  );
+
+  const dinnerMeals = meals.filter(
+    (meal) => meal.mealPeriod?.toUpperCase() === "DINNER"
+  );
+
+  if (loading) {
+    return <p>Loading today's meals...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <div className="meals-page">
-      <div className="meals-header">
-        <h1>Today's Meals</h1>
-        <p>Explore what's available at the cafeteria today.</p>
-      </div>
+      <h1>Today's Meals</h1>
 
-      <div className="meals-grid">
-        {meals.map((meal) => (
-          <MealCard
-            key={meal.id}
-            meal={meal}
+      {meals.length === 0 ? (
+        <p className="no-meals">
+          No meals have been published for today.
+        </p>
+      ) : (
+        <>
+          <MealSection
+            title="Breakfast"
+            meals={breakfastMeals}
           />
-        ))}
-      </div>
+
+          <MealSection
+            title="Lunch"
+            meals={lunchMeals}
+          />
+
+          <MealSection
+            title="Dinner"
+            meals={dinnerMeals}
+          />
+        </>
+      )}
     </div>
+  );
+}
+
+function MealSection({ title, meals }) {
+  return (
+    <section className="meal-section">
+      <h2>{title}</h2>
+
+      {meals.length === 0 ? (
+        <p className="no-meals">
+          No {title.toLowerCase()} available.
+        </p>
+      ) : (
+        <div className="meals-container">
+          {meals.map((meal) => (
+            <MealCard
+              key={meal.id}
+              meal={meal}
+            />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 

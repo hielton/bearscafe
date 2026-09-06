@@ -3,34 +3,35 @@ import "./MealCard.css";
 function MealCard({ meal }) {
   return (
     <div className="meal-card">
-      <div className="meal-card-image-container">
+
+      {meal.imageUrl && (
         <img
-          src={meal.image}
+          src={meal.imageUrl}
           alt={meal.name}
           className="meal-card-image"
         />
-      </div>
+      )}
 
       <div className="meal-card-content">
-        <div className="meal-card-header">
-          <h2>{meal.name}</h2>
-          <span className="meal-category">{meal.category}</span>
-        </div>
+        <h2>{meal.name}</h2>
 
         <p className="meal-description">
           {meal.description}
         </p>
 
-        <div className="meal-card-footer">
-          <div className="meal-rating">
-            <span className="stars">★★★★★</span>
-            <span className="rating-number">
-              {meal.rating}
-            </span>
-          </div>
+        <p>
+          <strong>Date:</strong> {meal.mealDate}
+        </p>
 
-        </div>
+        <p>
+          <strong>Meal Period:</strong> {meal.mealPeriod}
+        </p>
+
+        <p>
+          <strong>Status:</strong> {meal.status}
+        </p>
       </div>
+
     </div>
   );
 }
