@@ -1,46 +1,155 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import "./App.css";
-import Navbar from "./components/Navbar/Navbar";
+import StaffNavbar from "./components/StaffNavbar/StaffNavbar";
+import StudentNavbar from "./components/StudentNavbar/StudentNavbar";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 import Login from "./pages/Login/Login";
-import Home from "./pages/Home/Home";
 import Meals from "./pages/Meals/Meals";
 import StaffDashboard from "./pages/StaffDashboard/StaffDashboard";
+import MealManagement from "./pages/MealManagement/MealManagement";
 import AddMeal from "./pages/AddMeal/AddMeal";
 import EditMeal from "./pages/EditMeal/EditMeal";
 
-function AppContent() {
-  const location = useLocation();
+import "./App.css";
 
-  const hideNavbar =
-    location.pathname === "/" ||
-    location.pathname === "/login";
+function App() {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  const isStudent =
+    token && role === "STUDENT";
+
+  const isStaff =
+    token &&
+    (role === "STAFF" || role === "ADMIN");
 
   return (
     <>
-      {!hideNavbar && <Navbar />}
+      {isStudent && <StudentNavbar />}
+
+      {isStaff && <StaffNavbar />}
 
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
 
-        <Route path="/home" element={<Home />} />
-        <Route path="/meals" element={<Meals />} />
-        <Route path="/staff-dashboard" element={<StaffDashboard />} />
-        <Route path="/add-meals" element={<AddMeal />} />
-        <Route path="/edit-meal/:id" element={<EditMeal />}
-/>
+        {/* Default route */}
+        <Route
+          path="/"
+          element={
+            !token ? (
+              <Navigate
+                to="/login"
+                replace
+              />
+            ) : isStudent ? (
+              <Navigate
+                to="/meals"
+                replace
+              />
+            ) : (
+              <Navigate
+                to="/staff-dashboard"
+                replace
+              />
+            )
+          }
+        />
+
+        {/* Login */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        {/* Student route */}
+        <Route
+          path="/meals"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+                "STAFF",
+                "ADMIN",
+              ]}
+            >
+              <Meals />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Staff Dashboard */}
+        <Route
+          path="/staff-dashboard"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STAFF",
+                "ADMIN",
+              ]}
+            >
+              <StaffDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Meal Management */}
+        <Route
+          path="/meal-management"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STAFF",
+                "ADMIN",
+              ]}
+            >
+              <MealManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Add Meal */}
+        <Route
+          path="/add-meals"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STAFF",
+                "ADMIN",
+              ]}
+            >
+              <AddMeal />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Meal */}
+        <Route
+          path="/edit-meal/:id"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STAFF",
+                "ADMIN",
+              ]}
+            >
+              <EditMeal />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Unknown URL */}
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+
       </Routes>
     </>
-  );
-}
-
-function App() {
-  return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
   );
 }
 

@@ -98,3 +98,26 @@
 .login-footer a:hover {
   text-decoration: underline;
 }
+
+.login-error {
+  padding: 12px 14px;
+  margin: 0 0 18px;
+
+  background-color: #ffebee;
+  border: 1px solid #f2b8be;
+  border-radius: 7px;
+
+  color: #8a1c24;
+
+  font-size: 0.9rem;
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-form input:disabled {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+}

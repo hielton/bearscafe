@@ -17,21 +17,28 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
     private boolean enabled = true;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public User() {
     }
 
-    public User(String name, String email, String passwordHash, Role role) {
+    public User(
+            String name,
+            String email,
+            String passwordHash,
+            Role role
+    ) {
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;

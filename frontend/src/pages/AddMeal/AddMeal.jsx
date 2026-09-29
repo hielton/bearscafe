@@ -1,5 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
+
+import api from "../../api/axios";
+
 import "./AddMeal.css";
 
 function AddMeal() {
@@ -14,6 +16,7 @@ function AddMeal() {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -29,16 +32,22 @@ function AddMeal() {
 
     setMessage("");
     setError("");
+    setSubmitting(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/meals",
+      const response = await api.post(
+        "/meals",
         formData
       );
 
-      console.log("Meal created:", response.data);
+      console.log(
+        "Meal created:",
+        response.data
+      );
 
-      setMessage("Meal added successfully!");
+      setMessage(
+        "Meal added successfully!"
+      );
 
       setFormData({
         name: "",
@@ -49,8 +58,22 @@ function AddMeal() {
         status: "DRAFT",
       });
     } catch (error) {
-      console.error("Error adding meal:", error);
-      setError("Could not add meal. Please try again.");
+      console.error(
+        "Error adding meal:",
+        error
+      );
+
+      if (error.response?.status === 403) {
+        setError(
+          "You do not have permission to add meals."
+        );
+      } else {
+        setError(
+          "Could not add meal. Please try again."
+        );
+      }
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -58,9 +81,13 @@ function AddMeal() {
     <div className="add-meal-page">
       <h1>Add Meal</h1>
 
-      <form className="add-meal-form" onSubmit={handleSubmit}>
+      <form
+        className="add-meal-form"
+        onSubmit={handleSubmit}
+      >
         <label>
           Meal Name
+
           <input
             type="text"
             name="name"
@@ -72,6 +99,7 @@ function AddMeal() {
 
         <label>
           Description
+
           <textarea
             name="description"
             value={formData.description}
@@ -82,6 +110,7 @@ function AddMeal() {
 
         <label>
           Meal Date
+
           <input
             type="date"
             name="mealDate"
@@ -93,32 +122,51 @@ function AddMeal() {
 
         <label>
           Meal Period
+
           <select
             name="mealPeriod"
             value={formData.mealPeriod}
             onChange={handleChange}
           >
-            <option value="BREAKFAST">Breakfast</option>
-            <option value="LUNCH">Lunch</option>
-            <option value="DINNER">Dinner</option>
+            <option value="BREAKFAST">
+              Breakfast
+            </option>
+
+            <option value="LUNCH">
+              Lunch
+            </option>
+
+            <option value="DINNER">
+              Dinner
+            </option>
           </select>
         </label>
 
         <label>
           Status
+
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
           >
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="UNPUBLISHED">Unpublished</option>
+            <option value="DRAFT">
+              Draft
+            </option>
+
+            <option value="PUBLISHED">
+              Published
+            </option>
+
+            <option value="UNPUBLISHED">
+              Unpublished
+            </option>
           </select>
         </label>
 
         <label>
           Image URL
+
           <input
             type="text"
             name="imageUrl"
@@ -128,17 +176,26 @@ function AddMeal() {
           />
         </label>
 
-        <button type="submit">
-          Add Meal
+        <button
+          type="submit"
+          disabled={submitting}
+        >
+          {submitting
+            ? "Adding Meal..."
+            : "Add Meal"}
         </button>
       </form>
 
       {message && (
-        <p className="success-message">{message}</p>
+        <p className="success-message">
+          {message}
+        </p>
       )}
 
       {error && (
-        <p className="error-message">{error}</p>
+        <p className="error-message">
+          {error}
+        </p>
       )}
     </div>
   );

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import {
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+
+import api from "../../api/axios";
+
 import "./EditMeal.css";
 
 function EditMeal() {
@@ -17,28 +22,54 @@ function EditMeal() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchMeal() {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/meals/${id}`
+        const response = await api.get(
+          `/meals/${id}`
         );
 
         setFormData({
           name: response.data.name || "",
-          description: response.data.description || "",
-          imageUrl: response.data.imageUrl || "",
-          mealDate: response.data.mealDate || "",
-          mealPeriod: response.data.mealPeriod || "BREAKFAST",
-          status: response.data.status || "DRAFT",
+          description:
+            response.data.description || "",
+          imageUrl:
+            response.data.imageUrl || "",
+          mealDate:
+            response.data.mealDate || "",
+          mealPeriod:
+            response.data.mealPeriod ||
+            "BREAKFAST",
+          status:
+            response.data.status || "DRAFT",
         });
 
-        setLoading(false);
+        setError("");
       } catch (error) {
-        console.error("Error loading meal:", error);
-        setError("Could not load the meal.");
+        console.error(
+          "Error loading meal:",
+          error
+        );
+
+        if (error.response?.status === 403) {
+          setError(
+            "You do not have permission to edit meals."
+          );
+        } else if (
+          error.response?.status === 404
+        ) {
+          setError(
+            "The requested meal could not be found."
+          );
+        } else {
+          setError(
+            "Could not load the meal."
+          );
+        }
+      } finally {
         setLoading(false);
       }
     }
@@ -58,21 +89,47 @@ function EditMeal() {
   async function handleSubmit(event) {
     event.preventDefault();
 
+    setError("");
+    setSaving(true);
+
     try {
-      await axios.put(
-        `http://localhost:8080/api/meals/${id}`,
+      await api.put(
+        `/meals/${id}`,
         formData
       );
 
-      navigate("/staff-dashboard");
+      navigate(
+        "/meal-management",
+        {
+          replace: true,
+        }
+      );
     } catch (error) {
-      console.error("Error updating meal:", error);
-      setError("Could not update the meal.");
+      console.error(
+        "Error updating meal:",
+        error
+      );
+
+      if (error.response?.status === 403) {
+        setError(
+          "You do not have permission to update meals."
+        );
+      } else {
+        setError(
+          "Could not update the meal."
+        );
+      }
+    } finally {
+      setSaving(false);
     }
   }
 
   if (loading) {
-    return <p>Loading meal...</p>;
+    return (
+      <div className="edit-meal-page">
+        <p>Loading meal...</p>
+      </div>
+    );
   }
 
   return (
@@ -80,7 +137,9 @@ function EditMeal() {
       <h1>Edit Meal</h1>
 
       {error && (
-        <p className="error-message">{error}</p>
+        <p className="error-message">
+          {error}
+        </p>
       )}
 
       <form
@@ -89,6 +148,7 @@ function EditMeal() {
       >
         <label>
           Meal Name
+
           <input
             type="text"
             name="name"
@@ -100,6 +160,7 @@ function EditMeal() {
 
         <label>
           Description
+
           <textarea
             name="description"
             value={formData.description}
@@ -110,6 +171,7 @@ function EditMeal() {
 
         <label>
           Meal Date
+
           <input
             type="date"
             name="mealDate"
@@ -121,26 +183,42 @@ function EditMeal() {
 
         <label>
           Meal Period
+
           <select
             name="mealPeriod"
             value={formData.mealPeriod}
             onChange={handleChange}
           >
-            <option value="BREAKFAST">Breakfast</option>
-            <option value="LUNCH">Lunch</option>
-            <option value="DINNER">Dinner</option>
+            <option value="BREAKFAST">
+              Breakfast
+            </option>
+
+            <option value="LUNCH">
+              Lunch
+            </option>
+
+            <option value="DINNER">
+              Dinner
+            </option>
           </select>
         </label>
 
         <label>
           Status
+
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
           >
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
+            <option value="DRAFT">
+              Draft
+            </option>
+
+            <option value="PUBLISHED">
+              Published
+            </option>
+
             <option value="UNPUBLISHED">
               Unpublished
             </option>
@@ -149,6 +227,7 @@ function EditMeal() {
 
         <label>
           Image URL
+
           <input
             type="text"
             name="imageUrl"
@@ -158,14 +237,20 @@ function EditMeal() {
         </label>
 
         <div className="edit-buttons">
-          <button type="submit">
-            Save Changes
+          <button
+            type="submit"
+            disabled={saving}
+          >
+            {saving
+              ? "Saving..."
+              : "Save Changes"}
           </button>
 
           <button
             type="button"
+            disabled={saving}
             onClick={() =>
-              navigate("/staff-dashboard")
+              navigate("/meal-management")
             }
           >
             Cancel

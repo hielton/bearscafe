@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import MealCard from "../../components/MealCard/MealCard";
 import "./Meals.css";
 
@@ -9,29 +9,51 @@ function Meals() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/meals/today")
+    api
+      .get("/meals/today")
       .then((response) => {
         setMeals(response.data);
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching today's meals:", error);
-        setError("Could not load today's meals.");
+        console.error(
+          "Error fetching today's meals:",
+          error
+        );
+
+        if (
+          error.response?.status === 401 ||
+          error.response?.status === 403
+        ) {
+          setError(
+            "Your session is invalid or expired. Please log in again."
+          );
+        } else {
+          setError(
+            "Could not load today's meals."
+          );
+        }
+
         setLoading(false);
       });
   }, []);
 
   const breakfastMeals = meals.filter(
-    (meal) => meal.mealPeriod?.toUpperCase() === "BREAKFAST"
+    (meal) =>
+      meal.mealPeriod?.toUpperCase() ===
+      "BREAKFAST"
   );
 
   const lunchMeals = meals.filter(
-    (meal) => meal.mealPeriod?.toUpperCase() === "LUNCH"
+    (meal) =>
+      meal.mealPeriod?.toUpperCase() ===
+      "LUNCH"
   );
 
   const dinnerMeals = meals.filter(
-    (meal) => meal.mealPeriod?.toUpperCase() === "DINNER"
+    (meal) =>
+      meal.mealPeriod?.toUpperCase() ===
+      "DINNER"
   );
 
   if (loading) {
