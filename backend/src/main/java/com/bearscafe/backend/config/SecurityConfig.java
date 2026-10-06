@@ -176,6 +176,52 @@ public class SecurityConfig {
                                 "ADMIN"
                         )
 
+                        // Students can submit or update a complete meal review
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/reviews/meal/*"
+                        )
+                        .hasRole(
+                                "STUDENT"
+                        )
+
+                        // Students can view their own complete meal review
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/reviews/meal/*/my-review"
+                        )
+                        .hasRole(
+                                "STUDENT"
+                        )
+
+                        // Students can view their own rating
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ratings/meal/*/my-rating"
+                        )
+                        .hasRole(
+                                "STUDENT"
+                        )
+
+                        // Students can create or update ratings
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/ratings/meal/*"
+                        )
+                        .hasRole(
+                                "STUDENT"
+                        )
+
+                        // Staff and admin can view ratings
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ratings/meal/*"
+                        )
+                        .hasAnyRole(
+                                "STAFF",
+                                "ADMIN"
+                        )
+
                         .anyRequest()
                         .authenticated()
                 )

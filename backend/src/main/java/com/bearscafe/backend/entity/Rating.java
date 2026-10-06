@@ -6,10 +6,15 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-    name = "ratings",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"student_id", "meal_id"})
-    }
+        name = "ratings",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {
+                                "student_id",
+                                "meal_id"
+                        }
+                )
+        }
 )
 public class Rating {
 
@@ -21,19 +26,31 @@ public class Rating {
     private Integer ratingValue;
 
     @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(
+            name = "student_id",
+            nullable = false
+    )
     private User student;
 
     @ManyToOne
-    @JoinColumn(name = "meal_id", nullable = false)
+    @JoinColumn(
+            name = "meal_id",
+            nullable = false
+    )
     private Meal meal;
 
     private LocalDateTime createdAt;
 
+    private LocalDateTime updatedAt;
+
     public Rating() {
     }
 
-    public Rating(Integer ratingValue, User student, Meal meal) {
+    public Rating(
+            Integer ratingValue,
+            User student,
+            Meal meal
+    ) {
         this.ratingValue = ratingValue;
         this.student = student;
         this.meal = meal;
@@ -42,6 +59,12 @@ public class Rating {
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -52,7 +75,9 @@ public class Rating {
         return ratingValue;
     }
 
-    public void setRatingValue(Integer ratingValue) {
+    public void setRatingValue(
+            Integer ratingValue
+    ) {
         this.ratingValue = ratingValue;
     }
 
@@ -60,7 +85,9 @@ public class Rating {
         return student;
     }
 
-    public void setStudent(User student) {
+    public void setStudent(
+            User student
+    ) {
         this.student = student;
     }
 
@@ -68,11 +95,17 @@ public class Rating {
         return meal;
     }
 
-    public void setMeal(Meal meal) {
+    public void setMeal(
+            Meal meal
+    ) {
         this.meal = meal;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }

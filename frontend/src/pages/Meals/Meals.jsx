@@ -1,21 +1,30 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import api from "../../api/axios";
 import MealCard from "../../components/MealCard/MealCard";
 import "./Meals.css";
 
 function Meals() {
   const [meals, setMeals] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
-    api
-      .get("/meals/today")
-      .then((response) => {
+    const loadMeals = async () => {
+      try {
+        const response =
+          await api.get(
+            "/meals/today"
+          );
+
         setMeals(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error(
           "Error fetching today's meals:",
           error
@@ -30,90 +39,157 @@ function Meals() {
           );
         } else {
           setError(
-            "Could not load today's meals."
+            "We could not load today's menu. Please try again."
           );
         }
-
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadMeals();
   }, []);
 
-  const breakfastMeals = meals.filter(
-    (meal) =>
-      meal.mealPeriod?.toUpperCase() ===
+  const breakfastMeals =
+    filterMealsByPeriod(
+      meals,
       "BREAKFAST"
-  );
+    );
 
-  const lunchMeals = meals.filter(
-    (meal) =>
-      meal.mealPeriod?.toUpperCase() ===
+  const lunchMeals =
+    filterMealsByPeriod(
+      meals,
       "LUNCH"
-  );
+    );
 
-  const dinnerMeals = meals.filter(
-    (meal) =>
-      meal.mealPeriod?.toUpperCase() ===
+  const dinnerMeals =
+    filterMealsByPeriod(
+      meals,
       "DINNER"
-  );
-
-  if (loading) {
-    return <p>Loading today's meals...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
+    );
 
   return (
-    <div className="meals-page">
-      <h1>Today's Meals</h1>
+    <main className="meals-page">
+      <header className="meals-header">
+        <span className="menu-eyebrow">
+          BearsCafe
+        </span>
 
-      {meals.length === 0 ? (
-        <p className="no-meals">
-          No meals have been published for today.
+        <h1>Today's Menu</h1>
+
+        <p>
+          See what's being served today and
+          share your experience with the
+          cafeteria team.
         </p>
+      </header>
+
+      {loading ? (
+        <div className="meals-state-card">
+          <div className="loading-spinner" />
+
+          <p>
+            Preparing today's menu...
+          </p>
+        </div>
+      ) : error ? (
+        <div className="meals-state-card error-state">
+          <span className="state-icon">
+            !
+          </span>
+
+          <h2>
+            Something went wrong
+          </h2>
+
+          <p>{error}</p>
+        </div>
+      ) : meals.length === 0 ? (
+        <div className="meals-state-card">
+          <span className="state-icon">
+            🍽️
+          </span>
+
+          <h2>
+            Today's menu isn't ready yet
+          </h2>
+
+          <p>
+            No meals have been published
+            for today. Please check back
+            soon.
+          </p>
+        </div>
       ) : (
-        <>
+        <div className="menu-sections">
           <MealSection
             title="Breakfast"
+            subtitle="Start your day with today's breakfast selection."
             meals={breakfastMeals}
           />
 
           <MealSection
             title="Lunch"
+            subtitle="See what's being served for lunch."
             meals={lunchMeals}
           />
 
           <MealSection
             title="Dinner"
+            subtitle="Finish the day with tonight's dinner options."
             meals={dinnerMeals}
           />
-        </>
+        </div>
       )}
-    </div>
+    </main>
   );
 }
 
-function MealSection({ title, meals }) {
+function MealSection({
+  title,
+  subtitle,
+  meals,
+}) {
+  if (meals.length === 0) {
+    return null;
+  }
+
   return (
     <section className="meal-section">
-      <h2>{title}</h2>
-
-      {meals.length === 0 ? (
-        <p className="no-meals">
-          No {title.toLowerCase()} available.
-        </p>
-      ) : (
-        <div className="meals-container">
-          {meals.map((meal) => (
-            <MealCard
-              key={meal.id}
-              meal={meal}
-            />
-          ))}
+      <div className="meal-section-header">
+        <div>
+          <h2>{title}</h2>
+          <p>{subtitle}</p>
         </div>
-      )}
+
+        <span className="meal-count">
+          {meals.length}{" "}
+          {meals.length === 1
+            ? "meal"
+            : "meals"}
+        </span>
+      </div>
+
+      <div className="meals-container">
+        {meals.map((meal) => (
+          <MealCard
+            key={meal.id}
+            meal={meal}
+          />
+        ))}
+      </div>
     </section>
+  );
+}
+
+function filterMealsByPeriod(
+  meals,
+  period
+) {
+  return meals.filter(
+    (meal) =>
+      meal.mealPeriod?.toUpperCase() ===
+      period
   );
 }
 
