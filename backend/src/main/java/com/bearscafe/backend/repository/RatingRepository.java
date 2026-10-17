@@ -1,3 +1,4 @@
+
 package com.bearscafe.backend.repository;
 
 import com.bearscafe.backend.entity.Rating;
@@ -6,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface RatingRepository extends JpaRepository<Rating, Long> {
+public interface RatingRepository
+        extends JpaRepository<Rating, Long> {
 
     List<Rating> findByMealId(Long mealId);
 
@@ -18,5 +20,9 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     boolean existsByStudentIdAndMealId(
             Long studentId,
             Long mealId
+    );
+
+    List<Rating> findByMealIdIn(
+            List<Long> mealIds
     );
 }

@@ -1,3 +1,4 @@
+
 import { NavLink, useNavigate } from "react-router-dom";
 import "./StaffNavbar.css";
 
@@ -5,27 +6,22 @@ function StaffNavbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Remove all authentication information.
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("name");
     localStorage.removeItem("email");
     localStorage.removeItem("role");
 
-    // Send the user back to the login page.
-    navigate("/login", {
-      replace: true,
-    });
-
-    // Refresh so App.jsx immediately updates
-    // the navbar based on the cleared authentication.
+    navigate("/login", { replace: true });
     window.location.reload();
   };
+
+  const navLinkClass = ({ isActive }) =>
+    isActive ? "staff-nav-link active" : "staff-nav-link";
 
   return (
     <nav className="staff-navbar">
       <div className="staff-navbar-container">
-
         <NavLink
           to="/staff-dashboard"
           className="staff-navbar-brand"
@@ -34,36 +30,30 @@ function StaffNavbar() {
         </NavLink>
 
         <div className="staff-navbar-links">
-
           <NavLink
             to="/staff-dashboard"
-            className={({ isActive }) =>
-              isActive
-                ? "staff-nav-link active"
-                : "staff-nav-link"
-            }
+            className={navLinkClass}
           >
             Dashboard
           </NavLink>
 
           <NavLink
+            to="/analytics"
+            className={navLinkClass}
+          >
+            Analytics
+          </NavLink>
+
+          <NavLink
             to="/meal-management"
-            className={({ isActive }) =>
-              isActive
-                ? "staff-nav-link active"
-                : "staff-nav-link"
-            }
+            className={navLinkClass}
           >
             Meal Management
           </NavLink>
 
           <NavLink
             to="/add-meals"
-            className={({ isActive }) =>
-              isActive
-                ? "staff-nav-link active"
-                : "staff-nav-link"
-            }
+            className={navLinkClass}
           >
             Add Meal
           </NavLink>
@@ -75,7 +65,6 @@ function StaffNavbar() {
           >
             Logout
           </button>
-
         </div>
       </div>
     </nav>

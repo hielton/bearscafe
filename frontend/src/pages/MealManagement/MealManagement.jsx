@@ -170,6 +170,13 @@ function MealManagement() {
       return;
     }
 
+    if (!meal.dish?.id) {
+      setError(
+        "This meal has no linked dish. Please verify its dish association before reusing it."
+      );
+      return;
+    }
+
     const reusedMeal = {
       name: meal.name,
       description: meal.description,
@@ -177,6 +184,8 @@ function MealManagement() {
       mealDate: today,
       mealPeriod: selectedPeriod,
       status: "PUBLISHED",
+      // Preserve the permanent dish identity across serving dates.
+      dish: { id: meal.dish.id },
     };
 
     try {

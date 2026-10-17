@@ -1,3 +1,4 @@
+
 package com.bearscafe.backend.service;
 
 import com.bearscafe.backend.dto.MealReviewRequest;
@@ -8,6 +9,8 @@ import com.bearscafe.backend.entity.Meal;
 import com.bearscafe.backend.entity.Rating;
 import com.bearscafe.backend.entity.Role;
 import com.bearscafe.backend.entity.User;
+
+import com.bearscafe.backend.exception.ResourceNotFoundException;
 
 import com.bearscafe.backend.repository.FeedbackRepository;
 import com.bearscafe.backend.repository.MealRepository;
@@ -33,17 +36,10 @@ public class MealReviewService {
             UserRepository userRepository,
             MealRepository mealRepository
     ) {
-        this.ratingRepository =
-                ratingRepository;
-
-        this.feedbackRepository =
-                feedbackRepository;
-
-        this.userRepository =
-                userRepository;
-
-        this.mealRepository =
-                mealRepository;
+        this.ratingRepository = ratingRepository;
+        this.feedbackRepository = feedbackRepository;
+        this.userRepository = userRepository;
+        this.mealRepository = mealRepository;
     }
 
     @Transactional
@@ -52,48 +48,40 @@ public class MealReviewService {
             Long mealId,
             MealReviewRequest request
     ) {
-
         if (request == null) {
             throw new IllegalArgumentException(
                     "Review information is required."
             );
         }
 
-        Integer ratingValue =
-                request.getRatingValue();
+        Integer ratingValue = request.getRatingValue();
 
-        String comment =
-                request.getComment() == null
-                        ? ""
-                        : request.getComment().trim();
+        String comment = request.getComment() == null
+                ? ""
+                : request.getComment().trim();
 
-        if (
-                ratingValue == null ||
-                ratingValue < 1 ||
-                ratingValue > 5
-        ) {
+        if (ratingValue == null || ratingValue < 1 || ratingValue > 5) {
             throw new IllegalArgumentException(
                     "Rating must be between 1 and 5."
             );
         }
 
-        if (
-                ratingValue <= 2 &&
-                comment.isBlank()
-        ) {
+        if (comment.length() > 2000) {
+            throw new IllegalArgumentException(
+                    "Feedback cannot exceed 2000 characters."
+            );
+        }
+
+        if (ratingValue <= 2 && comment.isBlank()) {
             throw new IllegalArgumentException(
                     "Written feedback is required for ratings of 1 or 2 stars."
             );
         }
 
-        User student =
-                userRepository
-                        .findByEmail(studentEmail)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Student not found."
-                                )
-                        );
+        User student = userRepository.findByEmail(studentEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student not found."
+                ));
 
         if (student.getRole() != Role.STUDENT) {
             throw new IllegalArgumentException(
@@ -101,98 +89,57 @@ public class MealReviewService {
             );
         }
 
-        Meal meal =
-                mealRepository
-                        .findById(mealId)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Meal not found."
-                                )
-                        );
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Meal not found."
+                ));
 
         Optional<Rating> existingRating =
-                ratingRepository
-                        .findByStudentIdAndMealId(
-                                student.getId(),
-                                mealId
-                        );
+                ratingRepository.findByStudentIdAndMealId(
+                        student.getId(),
+                        mealId
+                );
 
         Rating rating;
 
         if (existingRating.isPresent()) {
-
-            rating =
-                    existingRating.get();
-
-            rating.setRatingValue(
-                    ratingValue
-            );
-
+            rating = existingRating.get();
+            rating.setRatingValue(ratingValue);
         } else {
-
-            rating =
-                    new Rating(
-                            ratingValue,
-                            student,
-                            meal
-                    );
+            rating = new Rating(
+                    ratingValue,
+                    student,
+                    meal
+            );
         }
 
-        ratingRepository.save(
-                rating
-        );
+        ratingRepository.save(rating);
 
         Optional<Feedback> existingFeedback =
-                feedbackRepository
-                        .findByStudentIdAndMealId(
-                                student.getId(),
-                                mealId
-                        );
+                feedbackRepository.findByStudentIdAndMealId(
+                        student.getId(),
+                        mealId
+                );
 
         if (comment.isBlank()) {
-
-            if (existingFeedback.isPresent()) {
-                feedbackRepository.delete(
-                        existingFeedback.get()
-                );
-            }
-
+            existingFeedback.ifPresent(feedbackRepository::delete);
         } else if (existingFeedback.isPresent()) {
-
-            Feedback feedback =
-                    existingFeedback.get();
-
-            feedback.setComment(
-                    comment
-            );
-
-            feedbackRepository.save(
-                    feedback
-            );
-
+            Feedback feedback = existingFeedback.get();
+            feedback.setComment(comment);
+            feedbackRepository.save(feedback);
         } else {
-
-            Feedback feedback =
-                    new Feedback(
-                            comment,
-                            student,
-                            meal
-                    );
-
-            feedbackRepository.save(
-                    feedback
+            Feedback feedback = new Feedback(
+                    comment,
+                    student,
+                    meal
             );
+            feedbackRepository.save(feedback);
         }
-
-        String responseComment =
-                comment.isBlank()
-                        ? null
-                        : comment;
 
         return new MealReviewResponse(
                 mealId,
                 ratingValue,
-                responseComment,
+                comment.isBlank() ? null : comment,
                 "Review saved successfully."
         );
     }
@@ -202,67 +149,44 @@ public class MealReviewService {
             String studentEmail,
             Long mealId
     ) {
+        User student = userRepository.findByEmail(studentEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Student not found."
+                ));
 
-        User student =
-                userRepository
-                        .findByEmail(studentEmail)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Student not found."
-                                )
-                        );
-
-        /*
-         * First make sure the meal itself exists.
-         */
         if (!mealRepository.existsById(mealId)) {
-            throw new IllegalArgumentException(
+            throw new ResourceNotFoundException(
                     "Meal not found."
             );
         }
 
         Optional<Rating> rating =
-                ratingRepository
-                        .findByStudentIdAndMealId(
-                                student.getId(),
-                                mealId
-                        );
+                ratingRepository.findByStudentIdAndMealId(
+                        student.getId(),
+                        mealId
+                );
 
-        /*
-         * No rating means this student has not
-         * reviewed this meal yet.
-         *
-         * This is a normal state, not an error.
-         */
         if (rating.isEmpty()) {
             return Optional.empty();
         }
 
         Optional<Feedback> feedback =
-                feedbackRepository
-                        .findByStudentIdAndMealId(
-                                student.getId(),
-                                mealId
-                        );
-
-        String comment =
-                feedback
-                        .map(
-                                Feedback::getComment
-                        )
-                        .orElse(null);
-
-        MealReviewResponse response =
-                new MealReviewResponse(
-                        mealId,
-                        rating.get()
-                                .getRatingValue(),
-                        comment,
-                        "Review found."
+                feedbackRepository.findByStudentIdAndMealId(
+                        student.getId(),
+                        mealId
                 );
 
+        String comment = feedback
+                .map(Feedback::getComment)
+                .orElse(null);
+
         return Optional.of(
-                response
+                new MealReviewResponse(
+                        mealId,
+                        rating.get().getRatingValue(),
+                        comment,
+                        "Review found."
+                )
         );
     }
 }

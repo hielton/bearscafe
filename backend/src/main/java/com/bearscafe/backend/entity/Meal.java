@@ -131,4 +131,16 @@ public class Meal {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dish_id")
+    private Dish dish;
+
+    public Dish getDish() {
+        return dish;
+    }
+
+    public void setDish(Dish dish) {
+        this.dish = dish;
+    }
 }
