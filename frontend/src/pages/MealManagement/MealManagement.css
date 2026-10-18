@@ -213,40 +213,35 @@
 .history-main {
   display: flex;
   align-items: center;
-
   flex: 1;
-
   gap: 20px;
 }
 
-.history-image {
+.history-image{
+  box-sizing: border-box;
   width: 120px;
   height: 100px;
-
   flex-shrink: 0;
+  object-fit: contain;
+  object-position: center;
+  background:#faf4f6; 
+  border: 1px solid #f0e2e7;
+  border-radius: 9px}
 
-  object-fit: cover;
-
-  border-radius: 9px;
-}
-
-.history-info {
-  flex: 1;
+.history-info{flex: 1;
+  min-width: 0
 }
 
 .history-card-header {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-
   gap: 10px;
-
   margin-bottom: 8px;
 }
 
 .history-card-header h3 {
   margin: 0;
-
   font-size: 1.15rem;
 }
 

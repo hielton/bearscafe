@@ -1,54 +1,234 @@
+
 .add-meal-page {
-  max-width: 700px;
+  max-width: 850px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 42px 24px 70px;
+  color: #292329;
 }
 
-.add-meal-page h1 {
-  text-align: center;
+.add-meal-header {
   margin-bottom: 30px;
+}
+
+.add-meal-eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #8b1538;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.add-meal-header h1 {
+  margin: 0 0 12px;
+  color: #71102d;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  font-weight: 800;
+  text-align: left;
+}
+
+.add-meal-header p {
+  margin: 0;
+  color: #71666c;
+  line-height: 1.6;
 }
 
 .add-meal-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 23px;
+  padding: 35px;
+  background: #ffffff;
+  border: 1px solid #f0e2e7;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(92, 22, 46, 0.06);
 }
 
-.add-meal-form label {
+.add-meal-section-heading h2 {
+  margin: 0 0 6px;
+  color: #71102d;
+  font-size: 1.2rem;
+}
+
+.add-meal-section-heading p {
+  margin: 0;
+  color: #81737a;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.add-meal-form label:not(.add-meal-upload-label) {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-weight: 600;
+  gap: 9px;
+  color: #46343c;
+  font-size: 0.92rem;
+  font-weight: 650;
 }
 
-.add-meal-form input,
+.add-meal-form input:not([type="file"]),
 .add-meal-form textarea,
 .add-meal-form select {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #e3d7dc;
+  border-radius: 10px;
+  background: #fff;
+  color: #342830;
+  font: inherit;
+  font-weight: 400;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.add-meal-form input:focus,
+.add-meal-form textarea:focus,
+.add-meal-form select:focus {
+  outline: none;
+  border-color: #8b1538;
+  box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12);
 }
 
 .add-meal-form textarea {
+  min-height: 110px;
   resize: vertical;
 }
 
-.add-meal-form button {
-  padding: 12px 20px;
-  border: none;
+.add-meal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.required {
+  color: #b51f43;
+}
+
+.add-meal-divider {
+  height: 1px;
+  background: #eee1e5;
+  margin: 3px 0;
+}
+
+.add-meal-upload-area {
+  padding: 22px;
+  border: 2px dashed #d9b3c0;
+  border-radius: 14px;
+  background: #fff9fb;
+  text-align: center;
+}
+
+.add-meal-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #8b1538;
+  font-weight: 700;
+}
+
+.add-meal-upload-icon {
+  font-size: 2rem;
+}
+
+.add-meal-upload-label small {
+  color: #81737a;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.add-meal-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.add-meal-image-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.add-meal-image-preview img {
+  width: min(100%, 360px);
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #e8d6dd;
+}
+
+.add-meal-form button.add-meal-remove-image {
+  padding: 9px 16px;
+  background: #f6e7ec;
+  color: #8b1538;
+  border: 1px solid #e9cbd5;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.add-meal-form button.add-meal-submit {
+  padding: 15px 22px;
+  background: #8b1538;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
   font-size: 1rem;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.add-meal-form button.add-meal-submit:hover:not(:disabled) {
+  background: #6e102c;
+  transform: translateY(-1px);
+}
+
+.add-meal-form button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.success-message,
+.error-message {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 .success-message {
-  margin-top: 20px;
-  text-align: center;
+  background: #e9f6ed;
+  color: #216c3d;
+  border: 1px solid #bce1c7;
 }
 
 .error-message {
-  margin-top: 20px;
-  text-align: center;
+  background: #fff0f0;
+  color: #9d2333;
+  border: 1px solid #f1c3ca;
+}
+
+@media (max-width: 600px) {
+  .add-meal-page {
+    padding: 24px 15px 50px;
+  }
+
+  .add-meal-form {
+    padding: 22px 18px;
+  }
+
+  .add-meal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-meal-header h1 {
+    font-size: 2rem;
+  }
 }

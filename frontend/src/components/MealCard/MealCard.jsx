@@ -1,10 +1,7 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import {useEffect, useState} from "react";
 import api from "../../api/axios";
 import "./MealCard.css";
+import { getMealImageUrl } from "../../utils/mealImage";
 
 function MealCard({ meal }) {
   const [rating, setRating] = useState(0);
@@ -196,25 +193,20 @@ function MealCard({ meal }) {
   return (
     <article className="meal-card">
       <div className="meal-card-image-wrapper">
-
-        {meal.imageUrl ? (
+        {getMealImageUrl(meal) ? (
           <img
-            src={meal.imageUrl}
+            src={getMealImageUrl(meal)}
             alt={meal.name}
             className="meal-card-image"
+            loading="lazy"
           />
         ) : (
           <div className="meal-image-placeholder">
-            <span className="placeholder-icon">
-              🍽️
-            </span>
-
-            <span>
-              BearsCafe
-            </span>
+            <span className="placeholder-icon">🍽️</span>
+            <span>BearsCafe</span>
           </div>
         )}
-
+                
         <span className="meal-period-badge">
           {meal.mealPeriod}
         </span>

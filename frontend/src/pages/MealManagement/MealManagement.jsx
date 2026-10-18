@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import api from "../../api/axios";
 
 import "./MealManagement.css";
+import { getMealImageUrl } from "../../utils/mealImage";
 
 function MealManagement() {
   const [meals, setMeals] = useState([]);
@@ -84,9 +85,7 @@ function MealManagement() {
   }
 
   const today =
-    new Date().toLocaleDateString(
-      "en-CA"
-    );
+    [new Date().getFullYear(), String(new Date().getMonth() + 1).padStart(2, "0"), String(new Date().getDate()).padStart(2, "0")].join("-");
 
   const todayMeals = meals.filter(
     (meal) =>
@@ -297,15 +296,8 @@ function MealManagement() {
     setSortOrder("NEWEST");
   }
 
-  /*
-    Today's meals are not displayed
-    again in history.
-  */
-  const historyMeals =
-    meals.filter(
-      (meal) =>
-        meal.mealDate !== today
-    );
+  /* All meals remain manageable, including today's published meals. */
+  const historyMeals = meals;
 
   const filteredMeals =
     useMemo(() => {
@@ -457,7 +449,7 @@ function MealManagement() {
         <div className="section-heading">
           <div>
             <h2>
-              Meal History
+              All Meals
             </h2>
 
             <p className="meal-count">
@@ -465,7 +457,7 @@ function MealManagement() {
               {filteredMeals.length}{" "}
               of{" "}
               {historyMeals.length}{" "}
-              historical meals
+              saved meals
             </p>
           </div>
         </div>
@@ -645,15 +637,14 @@ function MealManagement() {
 
                     <div className="history-main">
 
-                      {meal.imageUrl && (
+                      {getMealImageUrl(meal) && (
                         <img
-                          src={
-                            meal.imageUrl
-                          }
+                          src={getMealImageUrl(meal)}
                           alt={
                             meal.name
                           }
                           className="history-image"
+                          loading="lazy"
                         />
                       )}
 
@@ -684,8 +675,7 @@ function MealManagement() {
 
                           <span>
                             <strong>
-                              Last
-                              served:
+                              Scheduled date:
                             </strong>{" "}
                             {
                               meal.mealDate
@@ -694,8 +684,7 @@ function MealManagement() {
 
                           <span>
                             <strong>
-                              Original
-                              period:
+                              Meal period:
                             </strong>{" "}
                             {
                               meal.mealPeriod

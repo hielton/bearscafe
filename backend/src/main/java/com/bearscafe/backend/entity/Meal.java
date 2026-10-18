@@ -1,3 +1,4 @@
+
 package com.bearscafe.backend.entity;
 
 import jakarta.persistence.*;
@@ -21,6 +22,9 @@ public class Meal {
     @Column(length = 1000)
     private String description;
 
+    // Optional override for this specific meal serving.
+    // If null, the frontend displays dish.imageUrl.
+    @Column(name = "image_url", length = 1000)
     private String imageUrl;
 
     @Column(nullable = false)
@@ -35,12 +39,21 @@ public class Meal {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FoodItem> foodItems = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "meal",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<FoodItem> foodItems =
+            new ArrayList<>();
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dish_id")
+    private Dish dish;
 
     public Meal() {
     }
@@ -131,10 +144,6 @@ public class Meal {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dish_id")
-    private Dish dish;
 
     public Dish getDish() {
         return dish;

@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import "./Login.css";
 
-function Login() {
+function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,8 +24,8 @@ function Login() {
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
         {
-          email: email,
-          password: password,
+          email,
+          password,
         }
       );
 
@@ -36,63 +37,40 @@ function Login() {
         role,
       } = response.data;
 
+      const validRoles = ["STUDENT", "STAFF", "ADMIN"];
+
+      if (!token || !validRoles.includes(role)) {
+        setError(
+          "Your account does not have valid login credentials."
+        );
+        return;
+      }
+
       // Save authentication information.
-      localStorage.setItem(
-        "token",
-        token
-      );
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", String(userId ?? ""));
+      localStorage.setItem("name", name ?? "");
+      localStorage.setItem("email", userEmail ?? "");
+      localStorage.setItem("role", role);
 
-      localStorage.setItem(
-        "userId",
-        userId
-      );
-
-      localStorage.setItem(
-        "name",
-        name
-      );
-
-      localStorage.setItem(
-        "email",
-        userEmail
-      );
-
-      localStorage.setItem(
-        "role",
-        role
-      );
+      // Update App immediately so the navbar appears.
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
 
       // Redirect based on role.
       if (role === "STUDENT") {
-        navigate("/meals");
-      } else if (
-        role === "STAFF" ||
-        role === "ADMIN"
-      ) {
-        navigate("/staff-dashboard");
+        navigate("/meals", { replace: true });
       } else {
-        setError(
-          "Your account does not have a valid role."
-        );
+        navigate("/staff-dashboard", { replace: true });
       }
     } catch (error) {
-      console.error(
-        "Login error:",
-        error
-      );
+      console.error("Login error:", error);
 
-      if (
-        error.response?.status === 401
-      ) {
-        setError(
-          "Invalid email or password."
-        );
-      } else if (
-        error.response?.status === 403
-      ) {
-        setError(
-          "Your account is disabled."
-        );
+      if (error.response?.status === 401) {
+        setError("Invalid email or password.");
+      } else if (error.response?.status === 403) {
+        setError("Your account is disabled.");
       } else {
         setError(
           "Unable to connect to the server. Please try again."
@@ -106,7 +84,6 @@ function Login() {
   return (
     <div className="login-page">
       <div className="login-container">
-
         <div className="login-header">
           <h1>Welcome Back!</h1>
 
@@ -119,11 +96,8 @@ function Login() {
           className="login-form"
           onSubmit={handleSubmit}
         >
-
           {error && (
-            <p className="login-error">
-              {error}
-            </p>
+            <p className="login-error">{error}</p>
           )}
 
           <div className="form-group">
@@ -167,11 +141,8 @@ function Login() {
             className="login-button"
             disabled={loading}
           >
-            {loading
-              ? "Logging in..."
-              : "Login"}
+            {loading ? "Logging in..." : "Login"}
           </button>
-
         </form>
 
         <div className="login-footer">
@@ -182,7 +153,6 @@ function Login() {
             </Link>
           </p>
         </div>
-
       </div>
     </div>
   );

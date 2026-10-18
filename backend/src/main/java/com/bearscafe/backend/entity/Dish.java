@@ -1,8 +1,6 @@
-
 package com.bearscafe.backend.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,6 +16,9 @@ public class Dish {
 
     @Column(length = 1000)
     private String description;
+
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
 
     private LocalDateTime createdAt;
 
@@ -52,6 +53,14 @@ public class Dish {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public LocalDateTime getCreatedAt() {

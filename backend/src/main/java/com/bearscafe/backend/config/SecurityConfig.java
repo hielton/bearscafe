@@ -1,3 +1,4 @@
+
 package com.bearscafe.backend.config;
 
 import com.bearscafe.backend.security.JwtAuthenticationFilter;
@@ -46,9 +47,7 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of(
-                        "http://localhost:5173"
-                )
+                List.of("http://localhost:5173")
         );
 
         configuration.setAllowedMethods(
@@ -69,9 +68,7 @@ public class SecurityConfig {
         );
 
         configuration.setExposedHeaders(
-                List.of(
-                        "Authorization"
-                )
+                List.of("Authorization")
         );
 
         configuration.setAllowCredentials(true);
@@ -123,7 +120,7 @@ public class SecurityConfig {
                         )
                         .permitAll()
 
-                        // Student, staff, and admin can view today's meals
+                        // Students, staff, and admin can view today's meals
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/meals/today"
@@ -176,41 +173,57 @@ public class SecurityConfig {
                                 "ADMIN"
                         )
 
+                        // Staff and admin can upload dish images
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/dishes/*/image"
+                        )
+                        .hasAnyRole(
+                                "STAFF",
+                                "ADMIN"
+                        )
+
+                        // Authenticated users can view dish images
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/dishes/images/*"
+                        )
+                        .permitAll()
+
+                        // Deny other dish endpoints by default
+                        .requestMatchers(
+                                "/api/dishes/**"
+                        )
+                        .denyAll()
+
+
                         // Students can submit or update a complete meal review
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/reviews/meal/*"
                         )
-                        .hasRole(
-                                "STUDENT"
-                        )
+                        .hasRole("STUDENT")
 
                         // Students can view their own complete meal review
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/reviews/meal/*/my-review"
                         )
-                        .hasRole(
-                                "STUDENT"
-                        )
+                        .hasRole("STUDENT")
 
                         // Students can view their own rating
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/ratings/meal/*/my-rating"
                         )
-                        .hasRole(
-                                "STUDENT"
-                        )
+                        .hasRole("STUDENT")
 
                         // Students can create or update ratings
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/ratings/meal/*"
                         )
-                        .hasRole(
-                                "STUDENT"
-                        )
+                        .hasRole("STUDENT")
 
                         // Staff and admin can view ratings
                         .requestMatchers(

@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import StaffNavbar from "./components/StaffNavbar/StaffNavbar";
@@ -15,14 +16,26 @@ import Analytics from "./pages/Analytics/Analytics";
 
 import "./App.css";
 
-function App() {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+function getStoredAuth() {
+  return {
+    token: localStorage.getItem("token"),
+    role: localStorage.getItem("role"),
+  };
+}
 
-  const isStudent = token && role === "STUDENT";
+function App() {
+  const [auth, setAuth] = useState(getStoredAuth);
+
+  const { token, role } = auth;
+
+  const isStudent = Boolean(token) && role === "STUDENT";
 
   const isStaff =
-    token && (role === "STAFF" || role === "ADMIN");
+    Boolean(token) && (role === "STAFF" || role === "ADMIN");
+
+  function handleLoginSuccess() {
+    setAuth(getStoredAuth());
+  }
 
   return (
     <>
@@ -37,13 +50,20 @@ function App() {
               <Navigate to="/login" replace />
             ) : isStudent ? (
               <Navigate to="/meals" replace />
-            ) : (
+            ) : isStaff ? (
               <Navigate to="/staff-dashboard" replace />
+            ) : (
+              <Navigate to="/login" replace />
             )
           }
         />
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={
+            <Login onLoginSuccess={handleLoginSuccess} />
+          }
+        />
 
         <Route
           path="/meals"
@@ -101,7 +121,10 @@ function App() {
           }
         />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
       </Routes>
     </>
   );
