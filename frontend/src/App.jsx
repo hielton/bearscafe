@@ -7,6 +7,7 @@ import StudentNavbar from "./components/StudentNavbar/StudentNavbar";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
 import Meals from "./pages/Meals/Meals";
 import StaffDashboard from "./pages/StaffDashboard/StaffDashboard";
 import MealManagement from "./pages/MealManagement/MealManagement";
@@ -28,10 +29,12 @@ function App() {
 
   const { token, role } = auth;
 
-  const isStudent = Boolean(token) && role === "STUDENT";
+  const isStudent =
+    Boolean(token) && role === "STUDENT";
 
   const isStaff =
-    Boolean(token) && (role === "STAFF" || role === "ADMIN");
+    Boolean(token) &&
+    (role === "STAFF" || role === "ADMIN");
 
   function handleLoginSuccess() {
     setAuth(getStoredAuth());
@@ -63,6 +66,11 @@ function App() {
           element={
             <Login onLoginSuccess={handleLoginSuccess} />
           }
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
         />
 
         <Route

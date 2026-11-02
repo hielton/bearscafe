@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 import "./Login.css";
@@ -13,6 +13,10 @@ function Login({ onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const registrationSuccess =
+    location.state?.registrationSuccess === true;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -24,7 +28,7 @@ function Login({ onLoginSuccess }) {
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
         {
-          email,
+          email: email.trim(),
           password,
         }
       );
@@ -46,19 +50,16 @@ function Login({ onLoginSuccess }) {
         return;
       }
 
-      // Save authentication information.
       localStorage.setItem("token", token);
       localStorage.setItem("userId", String(userId ?? ""));
       localStorage.setItem("name", name ?? "");
       localStorage.setItem("email", userEmail ?? "");
       localStorage.setItem("role", role);
 
-      // Update App immediately so the navbar appears.
       if (onLoginSuccess) {
         onLoginSuccess();
       }
 
-      // Redirect based on role.
       if (role === "STUDENT") {
         navigate("/meals", { replace: true });
       } else {
@@ -85,26 +86,32 @@ function Login({ onLoginSuccess }) {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
+          <div className="login-brand">
+            🐻 BearsCafe
+          </div>
           <h1>Welcome Back!</h1>
-
-          <p>
-            Sign in to access the cafeteria's menu.
-          </p>
+          <p>Sign in to access the cafeteria's menu.</p>
         </div>
+
+        {registrationSuccess && (
+          <p className="login-success" role="status">
+            Your student account was created successfully!
+            You can now log in.
+          </p>
+        )}
 
         <form
           className="login-form"
           onSubmit={handleSubmit}
         >
           {error && (
-            <p className="login-error">{error}</p>
+            <p className="login-error" role="alert">
+              {error}
+            </p>
           )}
 
           <div className="form-group">
-            <label htmlFor="email">
-              Email
-            </label>
-
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
@@ -113,16 +120,14 @@ function Login({ onLoginSuccess }) {
               onChange={(event) =>
                 setEmail(event.target.value)
               }
+              autoComplete="email"
               required
               disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">
-              Password
-            </label>
-
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
@@ -131,6 +136,7 @@ function Login({ onLoginSuccess }) {
               onChange={(event) =>
                 setPassword(event.target.value)
               }
+              autoComplete="current-password"
               required
               disabled={loading}
             />
@@ -148,9 +154,7 @@ function Login({ onLoginSuccess }) {
         <div className="login-footer">
           <p>
             Don't have an account?{" "}
-            <Link to="/register">
-              Create an account
-            </Link>
+            <Link to="/register">Create an account</Link>
           </p>
         </div>
       </div>

@@ -121,3 +121,24 @@
   background-color: #f3f3f3;
   cursor: not-allowed;
 }
+
+.login-success {
+  padding: 12px 14px;
+  margin: 0 0 20px;
+
+  background-color: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 7px;
+
+  color: #256029;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* BearsCafe branding above login title */
+.login-brand {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #8c1d40;
+  margin-bottom: 16px;
+}

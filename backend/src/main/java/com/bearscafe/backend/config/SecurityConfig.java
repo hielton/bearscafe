@@ -1,4 +1,3 @@
-
 package com.bearscafe.backend.config;
 
 import com.bearscafe.backend.security.JwtAuthenticationFilter;
@@ -113,6 +112,13 @@ public class SecurityConfig {
                         )
                         .permitAll()
 
+                        // Public student registration endpoint
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/signup"
+                        )
+                        .permitAll()
+
                         // Public test endpoint
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -183,7 +189,7 @@ public class SecurityConfig {
                                 "ADMIN"
                         )
 
-                        // Authenticated users can view dish images
+                        // Public access to uploaded dish images
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/dishes/images/*"
@@ -196,15 +202,14 @@ public class SecurityConfig {
                         )
                         .denyAll()
 
-
-                        // Students can submit or update a complete meal review
+                        // Students can submit or update a meal review
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/reviews/meal/*"
                         )
                         .hasRole("STUDENT")
 
-                        // Students can view their own complete meal review
+                        // Students can view their own meal review
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/reviews/meal/*/my-review"
