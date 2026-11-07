@@ -75,6 +75,16 @@ class UsdaNutritionServiceTest {
                 MediaType.APPLICATION_JSON
         ));
 
+        mockServer.expect(requestTo(
+                "https://api.nal.usda.gov/fdc/v1/food/12345"
+                + "?api_key=" + API_KEY
+        ))
+        .andExpect(method(HttpMethod.GET))
+        .andRespond(withSuccess(
+                "{\"foodPortions\": []}",
+                MediaType.APPLICATION_JSON
+        ));
+
         NutritionEstimateResponse result =
                 nutritionService.estimate("Chicken Sandwich");
 
@@ -120,6 +130,16 @@ class UsdaNutritionServiceTest {
         ))
         .andRespond(withSuccess(
                 usdaResponse,
+                MediaType.APPLICATION_JSON
+        ));
+
+        mockServer.expect(requestTo(
+                "https://api.nal.usda.gov/fdc/v1/food/67890"
+                + "?api_key=" + API_KEY
+        ))
+        .andExpect(method(HttpMethod.GET))
+        .andRespond(withSuccess(
+                "{\"foodPortions\": []}",
                 MediaType.APPLICATION_JSON
         ));
 
@@ -193,4 +213,193 @@ class UsdaNutritionServiceTest {
 
         mockServer.verify();
     }
+
+    // TEST 5: better match instead of the first result
+    @Test
+    void estimate_shouldSelectBestMatchingDish() {
+
+        String response = """
+                {
+                "foods": [
+                {
+                "fdcId": 111,
+                "description": "Chicken sandwich, fried, with cheese",
+                "foodNutrients": [
+                        {"nutrientId": 1008, "value": 300.0}
+                ]
+                },
+                {
+                "fdcId": 222,
+                "description": "Chicken sandwich",
+                "foodNutrients": [
+                        {"nutrientId": 1008, "value": 200.0}
+                ]
+                }
+                ]
+                }
+                """;
+
+        mockServer.expect(requestTo(
+                "https://api.nal.usda.gov/fdc/v1/foods/search"
+                + "?api_key=" + API_KEY
+        ))
+        .andRespond(withSuccess(
+                response, MediaType.APPLICATION_JSON
+        ));
+
+        mockServer.expect(requestTo(
+                "https://api.nal.usda.gov/fdc/v1/food/222"
+                + "?api_key=" + API_KEY
+        ))
+        .andRespond(withSuccess(
+                "{\"foodPortions\": []}",
+                MediaType.APPLICATION_JSON
+        ));
+
+        NutritionEstimateResponse result =
+                nutritionService.estimate("Chicken Sandwich");
+
+        assertEquals("Chicken sandwich", result.matchedFood());
+        assertEquals(222L, result.fdcId());
+        assertEquals(500.0, result.calories());
+
+        mockServer.verify();
+    }
+
+    //  TEST 6: USDA serving weight when available
+    @Test
+    void estimate_shouldUseUsdaServingWeight() {
+
+        String searchResponse = """
+        {
+          "foods": [
+            {
+              "fdcId": 333,
+              "description": "Lasagna",
+              "foodNutrients": [
+                {"nutrientId": 1008, "value": 160.0},
+                {"nutrientId": 1003, "value": 10.0}
+              ]
+            }
+          ]
+        }
+        """;
+
+        String detailResponse = """
+        {
+          "foodPortions": [
+            {
+              "modifier": "1 serving",
+              "amount": 1.0,
+              "gramWeight": 300.0
+            }
+          ]
+        }
+        """;
+
+        mockServer.expect(requestTo(
+            "https://api.nal.usda.gov/fdc/v1/foods/search"
+            + "?api_key=" + API_KEY
+        ))
+        .andRespond(withSuccess(
+            searchResponse, MediaType.APPLICATION_JSON
+        ));
+
+        mockServer.expect(requestTo(
+            "https://api.nal.usda.gov/fdc/v1/food/333"
+            + "?api_key=" + API_KEY
+        ))
+        .andRespond(withSuccess(
+            detailResponse, MediaType.APPLICATION_JSON
+        ));
+
+        NutritionEstimateResponse result =
+            nutritionService.estimate("Lasagna");
+
+        assertEquals(300.0, result.assumedServingGrams());
+        assertEquals(480.0, result.calories());
+        assertEquals(30.0, result.protein());
+        assertTrue(result.disclaimer().contains("USDA-reported"));
+
+        mockServer.verify();
+    }
+
+    // TEST 7: reject unrelated USDA results
+    @Test
+    void estimate_shouldRejectUnrelatedFood() {
+
+        String response = """
+        {
+          "foods": [
+            {
+              "fdcId": 444,
+              "description": "Chocolate cake",
+              "foodNutrients": [
+                {"nutrientId": 1008, "value": 350.0}
+              ]
+            }
+          ]
+        }
+        """;
+
+        mockServer.expect(requestTo(
+            "https://api.nal.usda.gov/fdc/v1/foods/search"
+            + "?api_key=" + API_KEY
+        ))
+        .andRespond(withSuccess(
+                response, MediaType.APPLICATION_JSON
+        ));
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> nutritionService.estimate("Chicken Sandwich")
+        );
+
+        assertEquals(
+            "No sufficiently similar USDA food was found.",
+            exception.getMessage()
+        );
+
+        mockServer.verify();
+    }
+
+    // TEST 8: Regression test for score
+    @Test
+    void estimate_shouldRejectDessertPizzaForPlainPizza() {
+
+        String response = """
+        {
+          "foods": [
+            {
+              "fdcId": 2708008,
+              "description": "Dessert pizza",
+              "foodNutrients": [
+                {"nutrientId": 1008, "value": 204.0}
+              ]
+            }
+          ]
+        }
+        """;
+
+        mockServer.expect(requestTo(
+            "https://api.nal.usda.gov/fdc/v1/foods/search"
+            + "?api_key=" + API_KEY
+        ))
+        .andRespond(withSuccess(
+            response, MediaType.APPLICATION_JSON
+        ));
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> nutritionService.estimate("Pizza")
+        );
+
+        assertEquals(
+            "No sufficiently similar USDA food was found.",
+            exception.getMessage()
+        );
+
+        mockServer.verify();
+    }
+
 }

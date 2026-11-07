@@ -9,12 +9,12 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class UsdaApiConfig {
 
-    @Bean
+    @Bean("usdaRestClient")
     public RestClient usdaRestClient(
-            RestClient.Builder builder,
             @Value("${usda.api.base-url}") String baseUrl
     ) {
-        return builder
+
+        return RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();
     }
