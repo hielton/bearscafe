@@ -91,6 +91,13 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<!-- Spring Boot Testing: JUnit 5, Mockito, AssertJ -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
