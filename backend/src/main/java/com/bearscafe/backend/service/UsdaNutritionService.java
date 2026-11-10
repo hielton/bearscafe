@@ -91,8 +91,7 @@ public class UsdaNutritionService {
             }
 
         } catch (RestClientException ex) {
-            // Use the assumed 250 g portion if the
-            // USDA details request is unavailable.
+            // Use the assumed 250 g portion if the USDA details request is unavailable.
         }
 
         Object nutrientsObject =
@@ -149,6 +148,69 @@ public class UsdaNutritionService {
                     + portionExplanation
                     + " This is not verified nutrition "
                     + "information for the cafeteria dish."
+        );
+    }
+
+    public NutritionEstimateResponse estimateIngredient(
+            String ingredientName,
+            double grams) {
+
+        if (ingredientName == null
+                || ingredientName.isBlank()
+                || ingredientName.trim().length() > 150) {
+
+            throw new IllegalArgumentException(
+                    "Ingredient name must contain 1 to 150 characters.");
+        }
+
+        if (!Double.isFinite(grams)
+                || grams <= 0
+                || grams > 1000) {
+            throw new IllegalArgumentException(
+                "Ingredient weight must be between 0 and 1000 g.");
+        }
+
+        String query = ingredientName.trim();
+
+        Map<?, ?> searchResponse = searchFoods(query);
+
+        Map<?, ?> matchedFood =
+                selectBestMatch(query, searchResponse);
+
+        Long fdcId = toLong(matchedFood.get("fdcId"));
+
+        String matchedName =
+                String.valueOf(matchedFood.get("description"));
+
+        Object nutrientsObject =
+                matchedFood.get("foodNutrients");
+
+        if (!(nutrientsObject instanceof List<?> nutrients)
+                || nutrients.isEmpty()) {
+            throw new IllegalStateException(
+                    "USDA did not return nutrient information.");
+        }
+
+        double multiplier = grams / 100.0;
+
+        return new NutritionEstimateResponse(
+                query,
+                matchedName,
+                fdcId,
+                grams,
+                scale(findNutrient(nutrients, 1008), multiplier),
+                scale(findNutrient(nutrients, 1003), multiplier),
+                scale(findNutrient(nutrients, 1005), multiplier),
+                scale(findNutrient(nutrients, 1004), multiplier),
+                scale(findNutrient(nutrients, 1079), multiplier),
+                scale(findNutrient(nutrients, 1162), multiplier),
+                scale(findNutrient(nutrients, 1087), multiplier),
+                scale(findNutrient(nutrients, 1089), multiplier),
+                "Estimated from comparable USDA ingredient: "
+                    + matchedName
+                    + ". Assumed ingredient weight: "
+                    + grams
+                    + " g. Actual cafeteria portions may differ."
         );
     }
 
