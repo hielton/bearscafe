@@ -6,6 +6,7 @@ import {
 import api from "../../api/axios";
 import MealCard from "../../components/MealCard/MealCard";
 import "./Meals.css";
+import AiChatbot from "../../components/AiChatbot/AiChatbot";
 
 function Meals() {
   const [meals, setMeals] = useState([]);
@@ -141,6 +142,8 @@ function Meals() {
           />
         </div>
       )}
+
+      <AiChatbot />
     </main>
   );
 }

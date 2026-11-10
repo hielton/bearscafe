@@ -240,6 +240,23 @@ public class SecurityConfig {
                                 "ADMIN"
                         )
 
+                        // Authenticated students, staff and admins can retrieve USDA nutrition estimates
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/nutrition/estimate"
+                        )
+                        .hasAnyRole(
+                                "STUDENT",
+                                "STAFF",
+                                "ADMIN"
+                        )
+
+                        // Students can acsess the AI Chat 
+                        .requestMatchers(
+                                HttpMethod.POST, "/api/ai/chat"
+                        )
+                        .hasRole("STUDENT")
+
                         .anyRequest()
                         .authenticated()
                 )

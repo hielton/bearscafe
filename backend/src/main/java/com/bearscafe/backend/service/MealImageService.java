@@ -116,7 +116,7 @@ public class MealImageService {
                         )
                 );
 
-        // Remove the override, not the dish image.
+        // Remove the override, not the dish image
         meal.setImageUrl(null);
 
         return mealRepository.save(meal);

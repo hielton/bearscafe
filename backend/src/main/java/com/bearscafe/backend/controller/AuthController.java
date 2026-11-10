@@ -149,7 +149,6 @@ public class AuthController {
 
         try {
 
-            // IMPORTANT:
             // Public registration always creates STUDENT accounts.
             // The frontend cannot assign STAFF or ADMIN roles.
             User student = userService.createUser(
@@ -172,8 +171,7 @@ public class AuthController {
 
         } catch (DataIntegrityViolationException exception) {
 
-            // Handles duplicate emails if two requests
-            // are submitted at nearly the same time.
+            // Handles duplicate emails if two requests are submitted at nearly the same time.
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(Map.of(
