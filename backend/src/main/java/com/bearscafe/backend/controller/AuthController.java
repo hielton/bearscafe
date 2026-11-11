@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private static final Pattern EMAIL_PATTERN =
