@@ -1,7 +1,8 @@
 
-const API_ORIGIN =
-  import.meta.env.VITE_API_ORIGIN ||
-  "http://localhost:8080";
+const API_ORIGIN = (
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:8080/api"
+).replace(/\/api\/?$/, "");
 
 export function getMealImageUrl(meal) {
   const imageUrl =
@@ -17,5 +18,5 @@ export function getMealImageUrl(meal) {
     return imageUrl;
   }
 
-  return new URL(imageUrl, API_ORIGIN).href;
+  return new URL(imageUrl, `${API_ORIGIN}/`).href;
 }

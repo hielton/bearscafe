@@ -5,7 +5,10 @@ import "./EditMeal.css";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "http://localhost:8080";
+const API_ORIGIN = (
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:8080/api"
+).replace(/\/api\/?$/, "");
 const EMPTY_FORM = {
   name: "", description: "", mealDate: "", mealPeriod: "BREAKFAST", status: "DRAFT",
 };
