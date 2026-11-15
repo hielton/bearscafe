@@ -379,10 +379,25 @@ public class UsdaNutritionService {
 
     private Set<String> words(String text) {
 
-        return Arrays.stream(text.split(" "))
-                .filter(word -> !word.isBlank())
-                .filter(word -> !STOP_WORDS.contains(word))
-                .collect(Collectors.toSet());
+    return Arrays.stream(text.split(" "))
+            .filter(word -> !word.isBlank())
+            .filter(word -> !STOP_WORDS.contains(word))
+            .map(this::normalizeFoodWord)
+            .collect(Collectors.toSet());
+    }
+
+    private String normalizeFoodWord(String word) {
+
+        // Common plural forms in food descriptions
+        if (word.equals("eggs")) return "egg";
+        if (word.equals("potatoes")) return "potato";
+        if (word.equals("tomatoes")) return "tomato";
+        if (word.equals("berries")) return "berry";
+        if (word.equals("beans")) return "bean";
+        if (word.equals("pancakes")) return "pancake";
+        if (word.equals("sausages")) return "sausage";
+
+        return word;
     }
 
     // Find USDA serving weight
