@@ -4,6 +4,14 @@
 A full-stack web application designed to improve communication between cafeteria staff and students by providing students with information about available meals and allowing them to provide feedback.
 The application also includes an AI-assisted image recognition feature that helps cafeteria staff identify food items from uploaded meal photos, reducing manual data entry.
 
+## Live Application
+Frontend: https://bearscafe.netlify.app
+Backend API: https://bearscafe-backend.onrender.com
+Deployment Notice: The backend is hosted on Render's free tier, which automatically spins down after approximately 15 minutes of inactivity. The first request after an idle period may take additional time while the server restarts. Once the backend is active, subsequent requests should respond normally.
+
+The backend's local filesystem is also ephemeral, meaning uploaded images stored locally may be lost after restarts or redeployments. Persistent cloud image storage is planned as a future improvement.
+
+
 ## Project Overview
 The Smart Cafeteria application provides separate functionality for students and cafeteria staff.
 
@@ -11,23 +19,30 @@ The Smart Cafeteria application provides separate functionality for students and
 * View available cafeteria meals
 * View meal images and descriptions
 * Rate meals from 1–5 stars
-* Leave optional feedback
+* Leave optional feedback, but required by 1-2 stars
 * View meal ratings and information
+* Ask food-related questions through an AI-powered chatbot
 
 ### Cafeteria staff can:
+* Publish meals for students
 * Create and manage meal information
 * Upload meal images
-* Use AI to identify food items in images
-* Review and correct AI-generated suggestions
-* Publish meals for students
 * View student ratings and feedback
 * View basic meal-performance analytics
 
-### AI-Assisted Workflow
-The AI feature is designed to assist cafeteria staff rather than replace their decision-making.
-The workflow is:
-Upload Image → AI Analysis → Suggested Food Items → Staff Review → Correction if Needed → Publish
-Staff members will always have the ability to review and correct the AI-generated results before the meal is shown to students.
+## AI-Powered Nutrition Chatbot
+
+BearsCafe includes an AI chatbot powered by Google's Gemini API.
+
+The chatbot helps students explore food-related topics, including meal ingredients, nutritional information, and general dietary questions.
+
+### USDA Nutrition Integration
+
+The application also integrates the USDA FoodData Central API to retrieve nutritional information for recognized or selected food items.
+
+This enables the application to provide estimates of nutritional values based on available USDA food records.
+
+Limitations: Nutritional information is estimated rather than laboratory-verified. Accuracy depends on the availability of matching USDA entries, portion sizes, and the similarity between database records and actual cafeteria meals.
 
 ## Project Goals
 The main goals of the project are to:
@@ -57,8 +72,15 @@ The main goals of the project are to:
 * PostgreSQL
 
 ### AI
-* AI / Computer Vision API for food image recognition
+* Gemini AI
 
+### Nutrition Data
+* USDA FoodData Central API
+
+### Security
+* Spring Securtity
+* JWT
+* BCrypt
 
 ## Project Structure
 ```text
@@ -70,20 +92,15 @@ smart-cafeteria/
 ├── frontend/
 │   └── React application
 │
-├── docs/
-│   ├── SRS
-│   ├── UML diagrams
-│   └── Database design
-│
 └── README.md
 ```
 
 ## Planned User Roles
-| Role          | Main Responsibilities                              |
-| ------------- | -------------------------------------------------- |
-| Student       | View meals, rate meals, provide feedback           |
-| Staff         | Manage meals, upload images, review AI suggestions |
-| Manager/Admin | View analytics and manage administrative functions |
+| Role          | Main Responsibilities                                   |
+| ------------- | ------------------------------------------------------- |
+| Student       | View meals, rate meals, provide feedback, chat with AI  |
+| Staff         | Manage meals, upload images                             |
+| Manager/Admin | View analytics and manage administrative functions      |
 
 ## Planned Core Features
 * [ ] User authentication
@@ -91,11 +108,10 @@ smart-cafeteria/
 * [ ] Student meal dashboard
 * [ ] Staff meal management
 * [ ] Meal image uploads
-* [ ] AI-assisted food identification
-* [ ] Staff verification of AI results
 * [ ] 1–5 star meal ratings
 * [ ] Student feedback
 * [ ] Staff analytics dashboard
+* [ ] AI-powered nutrition chatbot
 * [ ] Testing and validation
 * [ ] Deployment
 
@@ -121,21 +137,17 @@ The project will be developed incrementally following the Software Development L
 5. Deployment
 6. Evaluation and Documentation
 
-## Current Status
-Project Phase: Planning / Requirements
-The project is currently in the planning and requirements phase. Development of the application will begin after the initial requirements and system design have been finalized.
 
 ## Future Goals
 Potential future improvements include:
 * AI-generated summaries of student feedback
 * More advanced analytics
-* Dietary and allergen information
-* Meal recommendations
+* Improve USDA nutrition matching
 * Push notifications
 * Future meal schedules
 * University authentication integration
-* Mobile application
-* Custom food-recognition model
+* Improve scalability and performance
+* Persistent image storage
 
 
 CSC 490 – Senior Project
