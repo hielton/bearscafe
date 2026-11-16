@@ -5,9 +5,9 @@ A full-stack web application designed to improve communication between cafeteria
 The application also includes an AI-assisted image recognition feature that helps cafeteria staff identify food items from uploaded meal photos, reducing manual data entry.
 
 ## Live Application
-Frontend: https://bearscafe.netlify.app
-Backend API: https://bearscafe-backend.onrender.com
-Deployment Notice: The backend is hosted on Render's free tier, which automatically spins down after approximately 15 minutes of inactivity. The first request after an idle period may take additional time while the server restarts. Once the backend is active, subsequent requests should respond normally.
+Frontend: https://bearscafe.netlify.app  
+Backend API: https://bearscafe-backend.onrender.com  
+Deployment Notice: The backend is hosted on Render's free tier, which automatically spins down after approximately 15 minutes of inactivity. The first request after an idle period may take additional time while the server restarts. Once the backend is active, subsequent requests should respond normally.  
 
 The backend's local filesystem is also ephemeral, meaning uploaded images stored locally may be lost after restarts or redeployments. Persistent cloud image storage is planned as a future improvement.
 
